@@ -5,9 +5,11 @@ import { Select } from 'src/ui/select/Select';
 import { Text } from 'src/ui/text';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
+import { useEffect, useState, useRef, SyntheticEvent } from 'react';
 
 import styles from './ArticleParamsForm.module.scss';
 import {
+	defaultArticleState,
 	ArticleStateType,
 	fontColors,
 	backgroundColors,
@@ -17,22 +19,15 @@ import {
 	fontSizeOptions,
 } from 'src/constants/articleProps';
 
-import { useEffect, useState, useRef, SyntheticEvent } from 'react';
-
 interface ArticleParamsFormProps {
-	stateArticle: ArticleStateType;
 	setStateArticle: (data: ArticleStateType) => void;
-	formChange: () => void;
 }
 
-export const ArticleParamsForm = ({
-	stateArticle,
-	setStateArticle,
-	formChange,
-}: ArticleParamsFormProps) => {
+export const ArticleParamsForm = (props: ArticleParamsFormProps) => {
+	const { setStateArticle } = props;
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [selectedStateArticle, setSelectedStateArticle] =
-		useState<ArticleStateType>(stateArticle);
+		useState(defaultArticleState);
 	const articleParamsFormRef = useRef<HTMLFormElement>(null);
 
 	const handleChangeSelectedState = (
@@ -48,26 +43,26 @@ export const ArticleParamsForm = ({
 	};
 
 	const handleResetState = () => {
-		formChange();
-		setSelectedStateArticle(stateArticle);
+		setStateArticle(defaultArticleState);
+		setSelectedStateArticle(defaultArticleState);
 	};
 
 	useEffect(() => {
-		setSelectedStateArticle(stateArticle);
-	}, [stateArticle]);
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				articleParamsFormRef.current &&
+				!articleParamsFormRef.current.contains(event.target as Node)
+			) {
+				setIsOpen(false);
+			}
+		};
 
-	const handleClickOutside = (event: MouseEvent) => {
-		if (
-			articleParamsFormRef.current &&
-			!articleParamsFormRef.current.contains(event.target as Node)
-		) {
-			setIsOpen(false);
+		if (isOpen) {
+			document.addEventListener('mousedown', handleClickOutside);
+		} else {
+			document.removeEventListener('mousedown', handleClickOutside);
 		}
-	};
 
-	useEffect(() => {
-		if (!isOpen) return;
-		document.addEventListener('mousedown', handleClickOutside);
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
@@ -101,7 +96,7 @@ export const ArticleParamsForm = ({
 						onChange={(options) =>
 							handleChangeSelectedState('fontSizeOption', options)
 						}
-						title={'Размер шрифта'}
+						title='Размер шрифта'
 					/>
 
 					<Select
@@ -110,6 +105,7 @@ export const ArticleParamsForm = ({
 						onChange={(options) =>
 							handleChangeSelectedState('fontColor', options)
 						}
+						title='Цвет шрифта'
 					/>
 
 					<Separator />
@@ -120,6 +116,7 @@ export const ArticleParamsForm = ({
 						onChange={(options) =>
 							handleChangeSelectedState('backgroundColor', options)
 						}
+						title='Цвет фона'
 					/>
 
 					<Select
