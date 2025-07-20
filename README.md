@@ -30,8 +30,7 @@
 Клонируйте репозиторий:
 
 ```
-git clone https://github.com/Krylova-tan/blog-customizer.git
-cd blog-customizer
+git clone https://github.com/Krylova-tan/customizer_react.git
 ```
 
 Запустите приложение
